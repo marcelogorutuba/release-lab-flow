@@ -39,6 +39,20 @@ const messageCommonOptional: Record<string, FieldSpec> = {
   content: f('string', 'Truncated to 2000 chars; absent when EVO_FLOW_MESSAGE_CONTENT_DISABLED=true'),
 };
 
+const scheduledActionRequired: Record<string, FieldSpec> = {
+  scheduled_action_id: f('uuid', 'Numeric id of the scheduled action'),
+  action_type: f(
+    'string',
+    'send_message | execute_webhook | create_task | ...',
+  ),
+  scheduled_for: f('date', 'When the action was due'),
+  source: f('string'),
+};
+
+const scheduledActionOptional: Record<string, FieldSpec> = {
+  conversation_id: f('uuid'),
+};
+
 const ENTRIES: EventCatalogEntry[] = [
   {
     eventName: 'contact.created',
@@ -383,6 +397,78 @@ const ENTRIES: EventCatalogEntry[] = [
       },
     },
   },
+  // CRM-316: capture of POST /api/v1/webhooks/purchases/:provider, with the
+  // contact the CRM resolved — a journey starts on "bought X", a segment
+  // filters "spent more than Y".
+  {
+    eventName: 'purchase.approved',
+    category: 'purchase',
+    dtoType: 'track',
+    labelPt: 'Compra aprovada',
+    labelEn: 'Purchase approved',
+    description:
+      'A purchase was approved on a payment platform and captured as a lead in the CRM.',
+    schema: {
+      required: {
+        provider: f(
+          'string',
+          'Payment platform key (virtu, hotmart, kiwify, cakto)',
+        ),
+        purchase_id: f('string', 'Purchase/order id on the platform'),
+        pipeline_id: f('uuid'),
+        pipeline_item_id: f('uuid', 'Card that holds the purchase'),
+        source: f('string'),
+      },
+      optional: {
+        product: f('string'),
+        amount: f(
+          'number',
+          'Currency major unit (e.g. 197.5 reais), never cents',
+        ),
+        currency: f('string'),
+        platform_event: f('string', 'Event name as the platform sent it'),
+        outcome: f('string', 'created | already_in_pipeline'),
+        new_contact: f('boolean', 'Whether the purchase created the contact'),
+        contact_id: f('uuid'),
+        pipeline_name: f('string'),
+        pipeline_stage_id: f('uuid'),
+        pipeline_stage_name: f('string'),
+      },
+    },
+  },
+  {
+    eventName: 'scheduled_action.executed',
+    category: 'scheduled_action',
+    dtoType: 'track',
+    labelPt: 'Ação agendada executada',
+    labelEn: 'Scheduled action executed',
+    description: 'A scheduled action targeting the contact ran successfully.',
+    schema: {
+      required: scheduledActionRequired,
+      optional: {
+        ...scheduledActionOptional,
+        executed_at: f('date'),
+      },
+    },
+  },
+  {
+    eventName: 'scheduled_action.failed',
+    category: 'scheduled_action',
+    dtoType: 'track',
+    labelPt: 'Ação agendada falhou',
+    labelEn: 'Scheduled action failed',
+    description:
+      'A scheduled action targeting the contact failed or expired before running.',
+    schema: {
+      required: scheduledActionRequired,
+      optional: {
+        ...scheduledActionOptional,
+        error_message: f('string', 'Why it failed, truncated to 500 chars'),
+        retry_count: f('number', 'Failed attempts so far'),
+        will_retry: f('boolean', 'Whether another attempt is scheduled'),
+      },
+    },
+  },
   {
     eventName: 'custom',
     category: 'custom',
@@ -402,6 +488,8 @@ export const EVENT_CATEGORIES: readonly EventCategory[] = [
   'conversation',
   'message',
   'campaign',
+  'purchase',
+  'scheduled_action',
   'custom',
 ] as const;
 

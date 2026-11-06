@@ -21,6 +21,78 @@ describe('EventSchemaValidationPipe', () => {
     expect(pipe.transform(value, bodyMetadata)).toBe(value);
   });
 
+  // CRM-316: the payload the CRM emits for an approved purchase, as-is.
+  describe('purchase.approved (CRM-316)', () => {
+    const purchase = {
+      messageId: 'purchase.approved:c1:virtu.ord-1',
+      contactId: '550e8400-e29b-41d4-a716-446655440001',
+      event: 'purchase.approved',
+      properties: {
+        provider: 'virtu',
+        purchase_id: 'ord-1',
+        pipeline_id: '550e8400-e29b-41d4-a716-446655440002',
+        pipeline_item_id: '550e8400-e29b-41d4-a716-446655440003',
+        source: 'purchase_webhook',
+        product: 'Curso X',
+        amount: 297.9,
+        currency: 'BRL',
+        outcome: 'created',
+        new_contact: true,
+      },
+    };
+
+    it('accepts the CRM payload with a numeric amount', () => {
+      expect(pipe.transform(purchase, bodyMetadata)).toBe(purchase);
+    });
+
+    it('rejects a purchase without purchase_id', () => {
+      const rest: Record<string, unknown> = { ...purchase.properties };
+      delete rest.purchase_id;
+      expect(() =>
+        pipe.transform({ ...purchase, properties: rest }, bodyMetadata),
+      ).toThrow(BadRequestException);
+    });
+
+    it('rejects a string amount (the CRM must send a number)', () => {
+      const value = {
+        ...purchase,
+        properties: { ...purchase.properties, amount: '297.90' },
+      };
+      expect(() => pipe.transform(value, bodyMetadata)).toThrow(
+        BadRequestException,
+      );
+    });
+  });
+
+  describe('scheduled_action.failed', () => {
+    const failed = {
+      messageId: 'sa-1-failed-1',
+      contactId: '550e8400-e29b-41d4-a716-446655440001',
+      event: 'scheduled_action.failed',
+      properties: {
+        scheduled_action_id: 42,
+        action_type: 'execute_webhook',
+        scheduled_for: '2026-10-06T14:00:00Z',
+        source: 'scheduled_action',
+        error_message: 'Webhook failed with status 500',
+        retry_count: 1,
+        will_retry: true,
+      },
+    };
+
+    it('accepts the CRM payload with a numeric action id', () => {
+      expect(pipe.transform(failed, bodyMetadata)).toBe(failed);
+    });
+
+    it('rejects a payload without scheduled_for', () => {
+      const rest: Record<string, unknown> = { ...failed.properties };
+      delete rest.scheduled_for;
+      expect(() =>
+        pipe.transform({ ...failed, properties: rest }, bodyMetadata),
+      ).toThrow(BadRequestException);
+    });
+  });
+
   describe('AC3 — required field validation (track path)', () => {
     it('rejects message.delivered without message_id with MissingRequiredField', () => {
       const value = {

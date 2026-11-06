@@ -35,6 +35,48 @@ describe('events manifest catalog', () => {
     expect(custom?.schema.optional).toEqual({});
   });
 
+  // CRM-316: the purchase captured by the CRM webhook is a first-class event,
+  // in its own category, with the fields a journey trigger / segment filters on.
+  it('exposes purchase.approved as a track event in the purchase category', () => {
+    const entry = getEvent('purchase.approved');
+    expect(entry).toBeDefined();
+    expect(entry?.category).toBe('purchase');
+    expect(entry?.dtoType).toBe('track');
+    expect(Object.keys(entry!.schema.required).sort()).toEqual([
+      'pipeline_id',
+      'pipeline_item_id',
+      'provider',
+      'purchase_id',
+      'source',
+    ]);
+    expect(entry?.schema.optional.amount.type).toBe('number');
+    expect(entry?.schema.optional.product.type).toBe('string');
+    expect(EVENT_CATEGORIES).toContain('purchase');
+    expect(getEventsByCategory('purchase').map((e) => e.eventName)).toEqual([
+      'purchase.approved',
+    ]);
+  });
+
+  it('exposes the scheduled action outcomes as track events in their own category', () => {
+    const executed = getEvent('scheduled_action.executed');
+    const failed = getEvent('scheduled_action.failed');
+    for (const entry of [executed, failed]) {
+      expect(entry?.category).toBe('scheduled_action');
+      expect(entry?.dtoType).toBe('track');
+      expect(Object.keys(entry!.schema.required).sort()).toEqual([
+        'action_type',
+        'scheduled_action_id',
+        'scheduled_for',
+        'source',
+      ]);
+    }
+    expect(failed?.schema.optional.error_message.type).toBe('string');
+    expect(failed?.schema.optional.will_retry.type).toBe('boolean');
+    expect(
+      getEventsByCategory('scheduled_action').map((e) => e.eventName),
+    ).toEqual(['scheduled_action.executed', 'scheduled_action.failed']);
+  });
+
   it('returns undefined for an unknown event name', () => {
     expect(getEvent('not.a.real.event')).toBeUndefined();
   });
