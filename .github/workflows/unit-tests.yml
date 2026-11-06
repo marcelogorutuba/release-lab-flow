@@ -5,10 +5,7 @@ name: unit tests
 # Integration suites (Kafka, RabbitMQ, Redis) skip themselves without their env.
 
 on:
-  pull_request:
-    branches: [main, develop]
-  push:
-    branches: [main, develop]
+  workflow_call:
 
 # npm ci runs third-party install scripts; the token they could reach stays read-only.
 permissions:
