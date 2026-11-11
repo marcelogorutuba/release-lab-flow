@@ -19,7 +19,7 @@ jobs:
 
   publish:
     needs: test
-    uses: marcelogorutuba/release-lab-workflows/.github/workflows/publish-image.yml@main
+    uses: marcelogorutuba/release-lab-workflows/.github/workflows/publish-image.yml@v1.0.0
     permissions:
       contents: write
       packages: write
