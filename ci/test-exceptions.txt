@@ -1,0 +1,19 @@
+# Tests that do not pass in CI, one per line, checked by ci/check-test-results.mjs:
+#   file | test (jest full name, or * for the whole file) | class | owner | reason
+#
+# Classes, and the outcome the checker requires (any other outcome fails the job):
+#   known-failure      the test runs and fails today. A card tracks the fix. Must fail.
+#   not-runnable-here  needs something this repository does not have. Must be skipped.
+#   non-blocking       skipped on purpose by the repository. Must be skipped.
+#
+# These are not passing tests: the job summary lists them apart from the passed count.
+# A line that no longer matches (the test passes, runs, or is gone) fails the job, so
+# delete it with the fix. The owner reviews this file at every release cut.
+# Measured on 2026-11-13 against develop 4a8c627 with every integration flag on.
+
+test/events.e2e-spec.ts | Events validation (e2e) POST /api/v1/events/track accepts canonical event with success envelope (AC5) | known-failure | Danilo | The canonical track event gets 400 instead of 200/201. The test never ran in CI, so nobody saw when it started failing (EVENT_NAMES was frozen with @IsIn on 2026-05-21).
+test/app.e2e-spec.ts | * | known-failure | Danilo | The suite does not load: test/jest-e2e.json does not transform nanoid (ESM). It is the Nest scaffold test and still expects "Hello World!" from GET /.
+test/tenant-isolation.e2e-spec.ts | * | not-runnable-here | Danilo | Needs the enterprise RLS migration (1763000000000-AddTenantIdAndRLSToAllEntities), which lives in the enterprise overlay, not here. TENANT_ISOLATION_E2E stays off in CI.
+src/modules/temporal/workflows/journey-execution.coverage.spec.ts | Journey executor palette parity (EVO-1634) executor has a case for palette node %s | not-runnable-here | Danilo | Reads the journey node manifest from the frontend repository checked out next to this one; CI has only this repository.
+src/shared/broker/broker.contract.spec.ts | Broker contract suite kafka adapter reconnects and resumes delivery after a broker restart | non-blocking | Danilo | Restarts the broker container mid-test (BROKER_CONTRACT_RESTART=1); broker-contract.yml runs it apart with continue-on-error.
+src/shared/broker/broker.contract.spec.ts | Broker contract suite rabbitmq adapter reconnects and resumes delivery after a broker restart | non-blocking | Danilo | Restarts the broker container mid-test (BROKER_CONTRACT_RESTART=1); broker-contract.yml runs it apart with continue-on-error.
