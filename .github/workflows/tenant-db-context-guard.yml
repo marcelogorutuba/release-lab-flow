@@ -5,11 +5,12 @@ name: tenant-db-context guard
 # (@InjectRepository / AppDataSource.getRepository) instead of the TenantDbContext
 # seam, outside the documented allowlist. See scripts/check-tenant-db-context.mjs.
 
+# Called by pipeline.yml, so publish waits for it.
 on:
-  pull_request:
-    branches: [main, develop]
-  push:
-    branches: [main, develop]
+  workflow_call:
+
+permissions:
+  contents: read
 
 jobs:
   tenant-db-context:
