@@ -50,7 +50,7 @@ the outcome its class requires.
 
 | Test | Class | Why | Owner |
 |---|---|---|---|
-| `test/events.e2e-spec.ts` › accepts canonical event with success envelope (AC5) | known-failure | `POST /api/v1/events/track` answers 400 to the canonical event; never ran in CI before | Danilo |
+| `test/events.e2e-spec.ts` › accepts canonical event with success envelope (AC5) | known-failure | the test sends `contact.created` without the `properties.id` and `properties.source` the event schema requires since 2026-05-26, so it gets 400; the 400 body hides the missing field. A card tracks both | Danilo |
 | `test/app.e2e-spec.ts` (whole file) | known-failure | does not load (`nanoid` is ESM, `test/jest-e2e.json` does not transform it); scaffold test expecting "Hello World!" | Danilo |
 | `test/tenant-isolation.e2e-spec.ts` (whole file) | not-runnable-here | needs the enterprise RLS migration, which is not in this repository | Danilo |
 | `journey-execution.coverage.spec.ts` › palette node parity | not-runnable-here | reads a manifest from the frontend repository, which CI does not check out | Danilo |
