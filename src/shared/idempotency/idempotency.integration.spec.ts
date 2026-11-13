@@ -46,7 +46,7 @@ describeIntegration('IdempotencyService (integration)', () => {
     await expect(service.checkAndMark(hash)).resolves.toBe(true);
 
     const ttl = await control.ttl(`event:idempotency:${hash}`);
-    expect(ttl).toBeGreaterThan(4000);
+    expect(ttl).toBeGreaterThan(3500);
     expect(ttl).toBeLessThanOrEqual(3600);
   });
 
