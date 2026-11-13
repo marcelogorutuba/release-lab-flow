@@ -14,12 +14,15 @@ concurrency:
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
-  test:
-    uses: ./.github/workflows/unit-tests.yml
+  ci:
+    uses: ./.github/workflows/ci.yml
+
+  guard:
+    uses: ./.github/workflows/tenant-db-context-guard.yml
 
   publish:
-    needs: test
-    uses: marcelogorutuba/release-lab-workflows/.github/workflows/publish-image.yml@v1.0.0
+    needs: [ci, guard]
+    uses: marcelogorutuba/release-lab-workflows/.github/workflows/publish-image.yml@v1.4.0
     permissions:
       contents: write
       packages: write
