@@ -2681,5 +2681,10 @@
     "prettier/prettier": {
       "count": 188
     }
+  },
+  "src/app-factory.ts": {
+    "no-debugger": {
+      "count": 1
+    }
   }
 }
