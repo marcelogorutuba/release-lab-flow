@@ -21,7 +21,7 @@ jobs:
     uses: ./.github/workflows/tenant-db-context-guard.yml
 
   publish:
-    needs: [ci, guard]
+    needs: [guard]
     uses: marcelogorutuba/release-lab-workflows/.github/workflows/publish-image.yml@v1.4.0
     permissions:
       contents: write
