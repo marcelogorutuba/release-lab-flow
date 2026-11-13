@@ -11,7 +11,7 @@
 # delete it with the fix. The owner reviews this file at every release cut.
 # Measured on 2026-11-13 against develop 4a8c627 with every integration flag on.
 
-test/events.e2e-spec.ts | Events validation (e2e) POST /api/v1/events/track accepts canonical event with success envelope (AC5) | known-failure | Danilo | The canonical track event gets 400 instead of 200/201. The test never ran in CI, so nobody saw when it started failing (EVENT_NAMES was frozen with @IsIn on 2026-05-21).
+test/events.e2e-spec.ts | Events validation (e2e) POST /api/v1/events/track accepts canonical event with success envelope (AC5) | known-failure | Danilo | Gets 400: the test sends contact.created without properties, and since the event schema pipe (2026-05-26) that event requires properties.id and properties.source. The 400 body also hides which field is missing. A card tracks both.
 test/app.e2e-spec.ts | * | known-failure | Danilo | The suite does not load: test/jest-e2e.json does not transform nanoid (ESM). It is the Nest scaffold test and still expects "Hello World!" from GET /.
 test/tenant-isolation.e2e-spec.ts | * | not-runnable-here | Danilo | Needs the enterprise RLS migration (1763000000000-AddTenantIdAndRLSToAllEntities), which lives in the enterprise overlay, not here. TENANT_ISOLATION_E2E stays off in CI.
 src/modules/temporal/workflows/journey-execution.coverage.spec.ts | Journey executor palette parity (EVO-1634) executor has a case for palette node %s | not-runnable-here | Danilo | Reads the journey node manifest from the frontend repository checked out next to this one; CI has only this repository.
