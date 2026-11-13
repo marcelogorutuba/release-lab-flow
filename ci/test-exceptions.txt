@@ -17,3 +17,8 @@ test/tenant-isolation.e2e-spec.ts | * | not-runnable-here | Danilo | Needs the e
 src/modules/temporal/workflows/journey-execution.coverage.spec.ts | Journey executor palette parity (EVO-1634) executor has a case for palette node %s | not-runnable-here | Danilo | Reads the journey node manifest from the frontend repository checked out next to this one; CI has only this repository.
 src/shared/broker/broker.contract.spec.ts | Broker contract suite kafka adapter reconnects and resumes delivery after a broker restart | non-blocking | Danilo | Restarts the broker container mid-test (BROKER_CONTRACT_RESTART=1); broker-contract.yml runs it apart with continue-on-error.
 src/shared/broker/broker.contract.spec.ts | Broker contract suite rabbitmq adapter reconnects and resumes delivery after a broker restart | non-blocking | Danilo | Restarts the broker container mid-test (BROKER_CONTRACT_RESTART=1); broker-contract.yml runs it apart with continue-on-error.
+test/contact-events.e2e-spec.ts | some test | known-failure |  | lab: a line without an owner
+src/does/not/exist.spec.ts | some test | non-blocking | Danilo | lab: the file is gone
+test/health.e2e-spec.ts | * | known-failure | Danilo | lab: the whole file passes, so this line is stale
+test/contact-events.e2e-spec.ts | no such test | non-blocking | Danilo | lab: matches no test
+test/events.e2e-spec.ts | another test | flaky | Danilo | lab: a class the checker does not know
