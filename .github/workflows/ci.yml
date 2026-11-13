@@ -71,7 +71,6 @@ jobs:
       BROKER_CONTRACT: '1'
       KAFKA_INTEGRATION: '1'
       RABBITMQ_INTEGRATION: '1'
-      REDIS_INTEGRATION: '1'
       SEGMENT_E2E: '1'
       KAFKA_BROKERS: localhost:9092
       RABBITMQ_URL: amqp://admin:admin@localhost:5672
